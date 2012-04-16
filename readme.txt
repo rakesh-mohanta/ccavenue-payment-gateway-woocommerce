@@ -11,6 +11,7 @@ Allows you to use CCAvenue payment gateway with the WooCommerce plugin.
 
 This is the CCAvenue payment gateway for WooCommerce. Allows you to use CCAvenue payment gateway with the WooCommerce plugin. It uses the redirect method, the user is redirected to ccavenue so that you don't have to install an SSL certificate on your site.
 
+Visit [http://www.mrova.com/?p=748](http://www.mrova.com/?p=748)
 == Installation ==
 1. Ensure you have latest version of WooCommerce plugin installed
 2. Unzip and upload contents of the plugin to your /wp-content/plugins/ directory
