@@ -36,4 +36,6 @@ Visit [http://www.mrova.com/?p=748](http://www.mrova.com/?p=748)
 
 = 1.0 =
 * First Public Release.
+= 1.1 =
+* Some Optimizations.
 
