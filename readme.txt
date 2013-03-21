@@ -2,8 +2,8 @@
 Contributors: mRova
 Tags: WooCommerce, Payment Gateway, CCAvenue
 Requires at least: 3.3
-Tested up to: 3.3
-Stable tag: 1.1
+Tested up to: 3.5
+Stable tag: 1.2
 
 Allows you to use CCAvenue payment gateway with the WooCommerce plugin.
 
@@ -38,4 +38,6 @@ Visit [http://www.mrova.com/?p=748](http://www.mrova.com/?p=748)
 * First Public Release.
 = 1.1 =
 * Some Optimizations.
+= 1.2 =
+* Added WooCommerce 2.0.0 compatiblity.
 
