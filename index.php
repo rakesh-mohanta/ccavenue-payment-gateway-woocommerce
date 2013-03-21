@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: WooCommerce CCAvenue gateway
-Plugin URI: http://mrova.com/
+Plugin URI: http://www.mrova.com/
 Description: Extends WooCommerce with mrova ccavenue gateway.
-Version: 1.1
+Version: 1.2
 Author: mRova
-Author URI: http://mrova.com/
+Author URI: http://www.mrova.com/
 
     Copyright: © 2009-2012 mRova.
     License: GNU General Public License v3.0
@@ -46,7 +46,11 @@ function woocommerce_mrova_ccave_init() {
             $this -> msg['class'] = "";
             add_action('init', array(&$this, 'check_ccavenue_response'));
             add_action('valid-ccavenue-request', array(&$this, 'successful_request'));
-            add_action('woocommerce_update_options_payment_gateways', array(&$this, 'process_admin_options'));
+            if ( version_compare( WOOCOMMERCE_VERSION, '2.0.0', '>=' ) ) {
+                add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) );
+             } else {
+                add_action( 'woocommerce_update_options_payment_gateways', array( &$this, 'process_admin_options' ) );
+            }
             add_action('woocommerce_receipt_ccavenue', array(&$this, 'receipt_page'));
             add_action('woocommerce_thankyou_ccavenue',array(&$this, 'thankyou_page'));
         }
@@ -117,7 +121,7 @@ function woocommerce_mrova_ccave_init() {
          * Process the payment and return the result
          **/
         function process_payment($order_id){
-            $order = &new woocommerce_order($order_id);
+            $order = new WC_Order($order_id);
             return array('result' => 'success', 'redirect' => add_query_arg('order',
                 $order->id, add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
             );
@@ -133,7 +137,7 @@ function woocommerce_mrova_ccave_init() {
                 $order_id = (int)$order_id[0];
                 if($order_id != ''){
                     try{
-                        $order = new woocommerce_order($order_id);
+                        $order = new WC_Order($order_id);
                         $merchant_id = $_REQUEST['Merchant_Id'];
                         $amount = $_REQUEST['Amount'];
                         $checksum = $_REQUEST['Checksum'];
