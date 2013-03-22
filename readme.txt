@@ -40,4 +40,6 @@ Visit [http://www.mrova.com/?p=748](http://www.mrova.com/?p=748)
 * Some Optimizations.
 = 1.2 =
 * Added WooCommerce 2.0.0 compatiblity.
+= 1.2.1 =
+* changed woocommerce_order with new WC_Order($order_id);
 
