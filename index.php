@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce CCAvenue gateway
 Plugin URI: http://www.mrova.com/
 Description: Extends WooCommerce with mrova ccavenue gateway.
-Version: 1.2
+Version: 1.2.1
 Author: mRova
 Author URI: http://www.mrova.com/
 
@@ -212,7 +212,7 @@ function woocommerce_mrova_ccave_init() {
          **/
         public function generate_ccavenue_form($order_id){
             global $woocommerce;
-            $order = &new woocommerce_order($order_id);
+            $order = new WC_Order($order_id);
             $redirect_url = ($this -> redirect_page_id=="" || $this -> redirect_page_id==0)?get_site_url() . "/":get_permalink($this -> redirect_page_id);
             $order_id = $order_id.'_'.date("ymds");
             $checksum = $this -> getCheckSum($this -> merchant_id, $order -> order_total, $order_id, $redirect_url, $this -> working_key);
