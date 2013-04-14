@@ -3,11 +3,11 @@
 Plugin Name: WooCommerce CCAvenue gateway
 Plugin URI: http://www.mrova.com/
 Description: Extends WooCommerce with mrova ccavenue gateway.
-Version: 1.2.1
+Version: 1.2.2
 Author: mRova
 Author URI: http://www.mrova.com/
 
-    Copyright: © 2009-2012 mRova.
+    Copyright: © 2009-2013 mRova.
     License: GNU General Public License v3.0
     License URI: http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -23,11 +23,18 @@ function woocommerce_mrova_ccave_init() {
      */
     load_plugin_textdomain('wc-mrova-ccave', false, dirname( plugin_basename( __FILE__ ) ) . '/languages');
 
+    if($_GET['msg']!=''){
+        add_action('the_content', 'showMessage');
+    }
+
+    function showMessage($content){
+            return '<div class="box '.htmlentities($_GET['type']).'-box">'.htmlentities(urldecode($_GET['msg'])).'</div>'.$content;
+    }
     /**
      * Gateway class
      */
     class WC_Mrova_Ccave extends WC_Payment_Gateway {
-	protected $msg = array();
+    protected $msg = array();
         public function __construct(){
             // Go wild in here
             $this -> id = 'ccavenue';
@@ -45,6 +52,9 @@ function woocommerce_mrova_ccave_init() {
             $this -> msg['message'] = "";
             $this -> msg['class'] = "";
             add_action('init', array(&$this, 'check_ccavenue_response'));
+            //update for woocommerce >2.0
+            add_action( 'woocommerce_api_' . strtolower( get_class( $this ) ), array( $this, 'check_ccavenue_response' ) );
+
             add_action('valid-ccavenue-request', array(&$this, 'successful_request'));
             if ( version_compare( WOOCOMMERCE_VERSION, '2.0.0', '>=' ) ) {
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) );
@@ -132,9 +142,14 @@ function woocommerce_mrova_ccave_init() {
         function check_ccavenue_response(){
             global $woocommerce;
             if(isset($_REQUEST['Order_Id']) && isset($_REQUEST['AuthDesc'])){
+                $redirect_url = ($this -> redirect_page_id=="" || $this -> redirect_page_id==0)?get_site_url() . "/":get_permalink($this -> redirect_page_id);
+
                 $order_id_time = $_REQUEST['Order_Id'];
                 $order_id = explode('_', $_REQUEST['Order_Id']);
                 $order_id = (int)$order_id[0];
+                $this -> msg['class'] = 'error';
+                $this -> msg['message'] = "Thank you for shopping with us. However, the transaction has been declined.";
+
                 if($order_id != ''){
                     try{
                         $order = new WC_Order($order_id);
@@ -189,13 +204,20 @@ function woocommerce_mrova_ccave_init() {
                                 $order -> add_order_note('Failed');
                                 $order -> add_order_note($this->msg['message']);
                             }
-                            add_action('the_content', array(&$this, 'showMessage'));
+                            //removed for WooCOmmerce 2.0
+                            //add_action('the_content', array(&$this, 'showMessage'));
                         }}catch(Exception $e){
                             // $errorOccurred = true;
                             $msg = "Error";
                         }
 
                 }
+                $redirect_url = ($this -> redirect_page_id=="" || $this -> redirect_page_id==0)?get_site_url() . "/":get_permalink($this -> redirect_page_id);
+                //For wooCoomerce 2.0
+                $redirect_url = add_query_arg( array('msg'=> urlencode($this -> msg['message']), 'type'=>$this -> msg['class']), $redirect_url );
+
+                wp_redirect( $redirect_url );
+                exit;
 
 
 
@@ -204,9 +226,11 @@ function woocommerce_mrova_ccave_init() {
 
 
         }
-        function showMessage($content){
+       /*
+        //Removed For WooCommerce 2.0
+       function showMessage($content){
             return '<div class="box '.$this -> msg['class'].'-box">'.$this -> msg['message'].'</div>'.$content;
-        }
+        }*/
         /**
          * Generate CCAvenue button link
          **/
@@ -214,6 +238,8 @@ function woocommerce_mrova_ccave_init() {
             global $woocommerce;
             $order = new WC_Order($order_id);
             $redirect_url = ($this -> redirect_page_id=="" || $this -> redirect_page_id==0)?get_site_url() . "/":get_permalink($this -> redirect_page_id);
+          //For wooCoomerce 2.0
+            $redirect_url = add_query_arg( 'wc-api', get_class( $this ), $redirect_url );
             $order_id = $order_id.'_'.date("ymds");
             $checksum = $this -> getCheckSum($this -> merchant_id, $order -> order_total, $order_id, $redirect_url, $this -> working_key);
             $ccavenue_args = array(
@@ -381,6 +407,6 @@ jQuery(function(){
     }
 
     add_filter('woocommerce_payment_gateways', 'woocommerce_add_mrova_ccave_gateway' );
-}
+    }
 
 ?>
